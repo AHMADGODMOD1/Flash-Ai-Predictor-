@@ -1,0 +1,166 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>🚀 FLASH AI S1 🚀</title>  
+    <style>  
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');  body {  
+        font-family: 'Orbitron', sans-serif;  
+        background: #080808;  
+        color: white;  
+        text-align: center;  
+        overflow-x: hidden;  
+        transition: background 0.5s;  
+    }  
+
+    .glow {  
+        color: cyan;  
+        text-shadow: 0 0 10px cyan, 0 0 20px cyan, 0 0 40px cyan;  
+        animation: flicker 1.5s infinite alternate;  
+    }  
+
+    .box {  
+        background: rgba(255, 255, 255, 0.1);  
+        border-radius: 10px;  
+        backdrop-filter: blur(10px);  
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);  
+        padding: 20px;  
+        margin: 20px;  
+        display: inline-block;  
+        animation: float 3s infinite ease-in-out alternate;  
+    }  
+
+    @keyframes float {  
+        from { transform: translateY(0px); }  
+        to { transform: translateY(-10px); }  
+    }  
+
+    @keyframes flicker {  
+        from { opacity: 1; }  
+        to { opacity: 0.7; }  
+    }  
+
+    table {  
+        width: 90%;  
+        margin: auto;  
+        border-collapse: collapse;  
+        background: rgba(255, 255, 255, 0.1);  
+        backdrop-filter: blur(10px);  
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);  
+        border-radius: 10px;  
+        overflow: hidden;  
+    }  
+
+    th, td {  
+        padding: 15px;  
+        border: 1px solid cyan;  
+        text-align: center;  
+    }  
+
+    th {  
+        background: rgba(0, 255, 255, 0.2);  
+    }  
+
+    button {  
+        background: cyan;  
+        color: black;  
+        border: none;  
+        padding: 10px 20px;  
+        cursor: pointer;  
+        font-size: 18px;  
+        transition: 0.3s;  
+        border-radius: 5px;  
+        margin: 10px;  
+    }  
+
+    button:hover {  
+        background: white;  
+        box-shadow: 0 0 10px cyan;  
+    }  
+
+    .prediction {  
+        font-size: 24px;  
+        font-weight: bold;  
+    }  
+</style>
+
+</head>  
+<body>  <h1 class="glow">🚀 FLASH AI S1 🚀</h1>  <!-- Timer Box -->  <div class="box">  
+    <h2 id="timeRemaining">⌛ Time Remaining: 60</h2>  
+</div>  <!-- Prediction Box -->  <div class="box prediction">  
+    <h2 id="predictedNumber">🔮 AI Prediction: Loading...</h2>  
+</div>  <!-- Data Table -->  <div class="box">  
+    <table id="dataTable">  
+        <thead>  
+            <tr>  
+                <th>Issue</th>  
+                <th>Number</th>  
+                <th>Big/Small</th>  
+                <th>Color</th>  
+                <th>Premium</th>  
+            </tr>  
+        </thead>  
+        <tbody></tbody>  
+    </table>  
+</div>  <!-- Buttons -->  <button id="refreshBtn">🔄 Refresh Data</button>
+<button id="autoRefreshBtn">🔁 Auto Refresh: OFF</button>
+
+<script>  
+    document.addEventListener('DOMContentLoaded', function() {  
+        const tableBody = document.querySelector('#dataTable tbody');  
+        const predictedNumberElement = document.getElementById('predictedNumber');  
+        const timerElement = document.getElementById('timeRemaining');  
+        let autoRefresh = false;  
+        let autoRefreshInterval;  
+  
+        const fetchData = () => {  
+            return fetch('https://api.bdg88zf.com/api/webapi/GetNoaverageEmerdList', {  
+                method: 'POST',  
+                headers: {  
+                    'Content-Type': 'application/json;charset=UTF-8',  
+                    'Accept': 'application/json, text/plain, */*'  
+                },  
+                body: JSON.stringify({  
+                    pageSize: 10,  
+                    pageNo: 1,  
+                    typeId: 1,  
+                    language: 0,  
+                    random: "ded40537a2ce416e96c00e5218f6859a",  
+                    signature: "69306982EEEB19FA940D72EC93C62552",  
+                    timestamp: Math.floor(Date.now() / 1000)  
+                })  
+            })  
+            .then(response => response.json())  
+            .catch(error => console.error('Error fetching data:', error));  
+        };  
+  
+        const updateData = async () => {  
+            const data = await fetchData();  
+            tableBody.innerHTML = '';  
+            const historyData = data.data.list;  
+  
+            historyData.forEach(item => {  
+                const row = document.createElement('tr');  
+                row.innerHTML = `<td>${item.issueNumber}</td>  
+                                 <td>${item.number}</td>  
+                                 <td>${item.number > 4 ? "Big" : "Small"}</td>  
+                                 <td>${item.colour}</td>  
+                                 <td>${item.premium}</td>`;  
+                tableBody.appendChild(row);  
+            });  
+  
+            // AI Prediction API Call  
+            const aiResponse = await fetch('http://localhost:5000/predict', {  
+                method: 'POST',  
+                headers: { 'Content-Type': 'application/json' },  
+                body: JSON.stringify({ history: historyData })  
+            });  
+            const aiResult = await aiResponse.json();  
+            predictedNumberElement.textContent = `🔮 AI Prediction: ${aiResult.prediction}`;  
+        };  
+  
+        document.getElementById('refreshBtn').addEventListener('click', updateData);  
+        updateData();  
+    });  
+</script>  </body>  
+</html>  
